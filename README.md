@@ -1,7 +1,7 @@
 # 📚 BookNestApp - User & Book Management System  
 
 ## 🚀 Overview  
-**BookNestApp** is a **Spring Boot** application for managing users and books with authentication, database interactions (**JPA & JDBC**), and caching for performance.  
+**BookNestApp** is a **Spring Boot** application for managing users and books with authentication, database interactions (**Hibernate, JPA & JDBC**), and caching for performance.  
 
 ## ✅ Features  
 - **User Management**: CRUD operations, authentication, and role-based authorization  
