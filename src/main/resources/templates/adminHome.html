@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{page.admin.home.title}">Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+          crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css">
+    <style>
+        body {
+            background-color: #f8bbd0;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            background-color: white !important;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .navbar-brand, .nav-link {
+            color: black !important;
+        }
+
+        .navbar-brand:hover, .nav-link:hover {
+            color: #555 !important;
+        }
+
+        .btn-primary {
+            background-color: black !important;
+            border-color: black !important;
+            color: white !important;
+        }
+
+        .btn-primary:hover {
+            background-color: white !important;
+            color: black !important;
+        }
+
+        .btn-secondary {
+            background-color: #555 !important;
+            border-color: #555 !important;
+            color: white !important;
+        }
+
+        .btn-secondary:hover {
+            background-color: white !important;
+            color: #555 !important;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" th:href="@{/adminHome}" th:text="#{nav.admin.title}">Admin Dashboard</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" sec:authorize="isAuthenticated()" th:href="@{/logout}" th:text="#{nav.logout}">Logout</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/editUser}" th:text="#{nav.edit.user}">Edit Profile</a>
+                </li>
+            </ul>
+            <div class="navbar-nav">
+                <a th:href="@{/adminHome(lang='en')}" class="me-3" th:text="#{nav.language.en}">🇬🇧</a>
+                <a th:href="@{/adminHome(lang='hr')}" class="me-3" th:text="#{nav.language.hr}">🇭🇷</a>
+            </div>
+        </div>
+    </div>
+</nav>
+<br/>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <!-- Success and Error Messages -->
+            <div th:if="${param.actionSuccess}" class="alert alert-success" th:text="#{}">Action completed successfully!</div>
+            <div th:if="${param.error}" class="alert alert-danger" th:text="#{}">An error occurred. Please try again.</div>
+
+            <h1 class="text-center mt-4" th:text="#{page.admin.home.title}">Admin Dashboard</h1>
+
+            <!-- Users and their books -->
+            <div class="mt-4">
+                <h2>User and Their Books</h2>
+                <th:block th:if="${users.isEmpty()}">
+                    <p class="text-center">No users or books to display.</p>
+                </th:block>
+                <th:block th:if="${!users.isEmpty()}">
+                    <div th:each="user : ${users}" class="card mt-3">
+                        <div class="card-body">
+                            <h5 class="card-title" th:text="'User: ' + ${user.firstName} + ' ' + ${user.lastName}"></h5>
+                            <p class="card-text" th:text="'Email: ' + ${user.email}"></p>
+                            <h6>Books:</h6>
+                            <ul th:if="${user.books.isEmpty()}">
+                                <li>No books added by this user.</li>
+                            </ul>
+                            <ul th:if="${!user.books.isEmpty()}" th:each="book : ${user.books}">
+                                <li th:text="${book.title} + ' by ' + ${book.author}"></li>
+                            </ul>
+                        </div>
+                    </div>
+                </th:block>
+            </div>
+
+            <!-- All books in the system -->
+            <div class="mt-4">
+                <h2>All Books in the System</h2>
+                <th:block th:if="${books.isEmpty()}">
+                    <p class="text-center">No books to display.</p>
+                </th:block>
+                <th:block th:if="${!books.isEmpty()}">
+                    <ul class="list-group">
+                        <li class="list-group-item" th:each="book : ${books}">
+                            <span th:text="'Title: ' + ${book.title}"></span> |
+                            <span th:text="'Author: ' + ${book.author}"></span> |
+                            <span th:text="'Price: ' + ${book.price} + ' USD'"></span> |
+                            <span th:text="'For Sale: ' + (${book.forSale} ? 'Yes' : 'No')"></span>
+                        </li>
+                    </ul>
+                </th:block>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

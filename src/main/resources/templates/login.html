@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{page.login.title}">Student Polling App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            background-color: #f8bbd0; /* Baby pink background */
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            background-color: white !important; /* White navbar background */
+            border-bottom: 1px solid #ddd; /* Optional: subtle border at the bottom */
+        }
+
+        .navbar-brand, .nav-link {
+            color: black !important; /* Black text for nav links */
+        }
+
+        .navbar-brand:hover, .nav-link:hover {
+            color: #555 !important; /* Darker shade on hover */
+        }
+
+        .btn-primary {
+            background-color: black !important; /* Black button background */
+            border-color: black !important; /* Black border */
+            color: white !important; /* White text */
+        }
+
+        .btn-primary:hover {
+            background-color: white !important; /* White background on hover */
+            color: black !important; /* Black text on hover */
+        }
+
+        .btn-secondary {
+            background-color: #555 !important; /* Dark gray background for secondary buttons */
+            border-color: #555 !important; /* Dark gray border */
+            color: white !important; /* White text */
+        }
+
+        .btn-secondary:hover {
+            background-color: white !important; /* White background on hover */
+            color: #555 !important; /* Dark gray text on hover */
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" th:href="@{/home}" th:text="#{nav.title}">Student Polling App</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" th:text="#{nav.register}" th:href="@{/register}">Register</a>
+                </li>
+            </ul>
+        </div>
+        <div class="navbar-nav">
+            <a th:href="@{/login(lang='en')}" class="me-3" th:text="#{nav.language.en}">🇬🇧</a>
+            <a th:href="@{/login(lang='hr')}" class="me-3" th:text="#{nav.language.hr}">🇭🇷</a>
+        </div>
+    </div>
+</nav>
+<br/>
+<br/>
+<br/>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div th:if="${param.error}">
+                <div class="alert alert-danger" th:text="#{error.login.invalid}">Invalid Email and Password.</div>
+            </div>
+            <div th:if="${param.logout}">
+                <div class="alert alert-success" th:text="#{success.logout}">You have been logged out.</div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="text-center" th:text="#{page.login.title}">Login</h3>
+                </div>
+                <div class="card-body">
+                    <form id="loginForm" class="form-horizontal" role="form">
+                        <div class="mb-3">
+                            <label for="email" class="control-label" th:text="#{form.user.email} + '*'">Email *</label>
+                            <input type="text" id="email" name="email" class="form-control" th:placeholder="#{form.user.email}" required/>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="control-label" th:text="#{form.user.password} + '*'">Password *</label>
+                            <input type="password" id="password" name="password" class="form-control" th:placeholder="#{form.user.password}" required/>
+                        </div>
+
+                        <div class="mb-3">
+                            <button type="button" id="loginButton" class="btn btn-primary" th:text="#{button.login}">Login</button>
+                            <span th:text="#{not.registered}">Not registered?
+                                <a th:href="@{/register}" th:text="#{register.link}">Register/SignUp Here</a>
+                            </span>
+                            <button type="button" id="registerButton" class="btn btn-primary" th:text="#{button.register}">Register</button>
+                        </div>
+                    </form>
+
+                    <script>
+                        $('#loginButton').click(function (e) {
+                            e.preventDefault();
+                            const email = $('#email').val();
+                            const password = $('#password').val();
+
+                            if (!email || !password) {
+                                alert("#{error.login.invalid}"); // Ensure inputs are provided
+                                return;
+                            }
+
+                            $.ajax({
+                                url: '/public/api/auth/login',
+                                type: 'POST',
+                                contentType: 'application/json',
+                                data: JSON.stringify({ email: email, password: password }),
+                                success: function (response) {
+                                    // Redirect based on the email
+                                    if (email === "admin@example.com") {
+                                        window.location.href = '/adminHome';
+                                    } else {
+                                        window.location.href = '/home';
+                                    }
+                                },
+                                error: function () {
+                                    alert("#{error.login.invalid}"); // Show an error alert
+                                }
+                            });
+                        });
+
+                        // Redirect to registration page on register button click
+                        $('#registerButton').click(function () {
+                            window.location.href = '/register';
+                        });
+
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

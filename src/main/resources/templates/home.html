@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{page.home.title}">Your Books</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+          crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css">
+    <style>
+        body {
+            background-color: #f8bbd0;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            background-color: white !important;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .navbar-brand, .nav-link {
+            color: black !important;
+        }
+
+        .navbar-brand:hover, .nav-link:hover {
+            color: #555 !important;
+        }
+
+        .btn-primary {
+            background-color: black !important;
+            border-color: black !important;
+            color: white !important;
+        }
+
+        .btn-primary:hover {
+            background-color: white !important;
+            color: black !important;
+        }
+
+        .btn-secondary {
+            background-color: #555 !important;
+            border-color: #555 !important;
+            color: white !important;
+        }
+
+        .btn-secondary:hover {
+            background-color: white !important;
+            color: #555 !important;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" th:href="@{/home}" th:text="#{nav.title}">Your Book Repository</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" sec:authorize="isAuthenticated()" th:href="@{/logout}" th:text="#{nav.logout}">Logout</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/editUser}" th:text="#{nav.edit.user}">Edit User</a>
+                </li>
+            </ul>
+            <div class="navbar-nav">
+                <a th:href="@{/home(lang='en')}" class="me-3" th:text="#{nav.language.en}">🇬🇧</a>
+                <a th:href="@{/home(lang='hr')}" class="me-3" th:text="#{nav.language.hr}">🇭🇷</a>
+            </div>
+        </div>
+    </div>
+</nav>
+<br/>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <!-- Success and Error Messages -->
+            <div th:if="${param.deleted}" class="alert alert-success" th:text="#{success.book.deleted}">Book successfully deleted!</div>
+            <div th:if="${param.sellSuccess}" class="alert alert-success" th:text="#{success.sell}">Book marked as for sale!</div>
+            <div th:if="${param.buySuccess}" class="alert alert-success" th:text="#{success.buy}">Book purchased successfully!</div>
+            <div th:if="${param.error}" class="alert alert-danger" th:text="#{error}">An error occurred. Please try again.</div>
+
+            <h1 class="text-center mt-4" th:text="#{page.home.title}">Your Books</h1>
+            <div class="d-flex justify-content-end mt-4">
+                <form class="form-inline my-2 my-lg-0" th:action="@{/addANewBook}" method="get">
+                    <button class="btn btn-success my-2 my-sm-0" type="submit">
+                        <i class="bi bi-plus-lg"></i> <span th:text="#{nav.add.book}">Add Book</span>
+                    </button>
+                </form>
+            </div>
+            <div class="mt-4">
+                <th:block th:if="${pollResponseInfo.isEmpty()}">
+                    <h3 class="text-center" th:text="#{page.no.books}">There are no books to display.</h3>
+                </th:block>
+
+                <th:block th:if="${!pollResponseInfo.isEmpty()}" th:each="bookInfo : ${pollResponseInfo}">
+                    <div class="card mt-3" th:classappend="${bookInfo.forSale ? 'border-danger' : ''}">
+                        <div class="card-body">
+                            <h5 class="card-title" th:text="${bookInfo.title}" th:classappend="${bookInfo.forSale ? 'text-decoration-line-through text-danger' : ''}"></h5>
+                            <p class="card-text" th:text="'Author: ' + ${bookInfo.author}"></p>
+                            <p class="card-text" th:text="'Price: ' + ${bookInfo.price} + ' USD'"></p>
+
+                            <div class="d-flex justify-content-between">
+                                <!-- Edit Book Button -->
+                                <a th:href="@{/edit/{id}(id=${bookInfo.id})}" class="btn btn-secondary" th:text="#{button.edit.book}">Edit Book Entry</a>
+
+                                <!-- Delete Book Button -->
+                                <form th:action="@{/private/api/poll/delete/{id}(id=${bookInfo.id})}" method="post" class="d-inline">
+                                    <button class="btn btn-danger" type="submit" th:text="#{button.delete}">Delete</button>
+                                </form>
+
+                                <!-- Mark as For Sale Button -->
+                                <form th:action="@{/private/api/poll/sell/{id}(id=${bookInfo.id})}" method="post" class="d-inline" th:if="${!bookInfo.forSale}">
+                                    <button class="btn btn-warning" type="submit" th:text="#{button.sell}">Sell</button>
+                                </form>
+
+                                <!-- Sold Status -->
+                                <span th:if="${bookInfo.forSale}" class="text-danger fw-bold">SOLD</span>
+
+                                <!-- Buy Button -->
+                                <a class="btn btn-primary" th:href="@{/buyBook/{id}(id=${bookInfo.id})}" th:text="#{button.buy}">Buy</a>
+                            </div>
+                        </div>
+                    </div>
+                </th:block>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

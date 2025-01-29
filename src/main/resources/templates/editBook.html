@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{page.edit.book.title}">Edit Book</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Page background */
+        body {
+            background-color: #f8bbd0; /* Baby pink background */
+            font-family: Arial, sans-serif; /* Consistent font */
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Navigation bar styles */
+        .navbar {
+            background-color: white !important; /* White navbar background */
+            border-bottom: 1px solid #ddd; /* Optional: subtle border at the bottom */
+        }
+
+        .navbar-brand, .nav-link {
+            color: black !important; /* Black text for nav links */
+        }
+
+        .navbar-brand:hover, .nav-link:hover {
+            color: #555 !important; /* Darker shade on hover */
+        }
+
+        /* Button styles */
+        .btn-primary {
+            background-color: black !important; /* Black button background */
+            border-color: black !important; /* Black border */
+            color: white !important; /* White text */
+        }
+
+        .btn-primary:hover {
+            background-color: white !important; /* White background on hover */
+            color: black !important; /* Black text on hover */
+        }
+
+        .btn-secondary {
+            background-color: #555 !important; /* Dark gray background for secondary buttons */
+            border-color: #555 !important; /* Dark gray border */
+            color: white !important; /* White text */
+        }
+
+        .btn-secondary:hover {
+            background-color: white !important; /* White background on hover */
+            color: #555 !important; /* Dark gray text on hover */
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" th:href="@{/home}" th:text="#{nav.title}">Your Book Repository</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</nav>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Error Messages -->
+            <div th:if="${error == 'REQUIRED_FIELDS'}" class="alert alert-danger" th:text="#{error.required.fields}">
+                All fields are required.
+            </div>
+            <div th:if="${error == 'DESCRIPTION_TOO_LONG'}" class="alert alert-danger" th:text="#{error.description.length}">
+                Description exceeds the maximum allowed length of 255 characters. Please shorten it.
+            </div>
+            <div th:if="${error}" class="alert alert-danger" th:text="#{error.message}">
+                An error has occurred. Please try again later.
+            </div>
+
+            <h1 class="text-center" th:text="#{page.edit.book.title}">Edit Book</h1>
+            <form th:action="@{/private/api/poll/edit/{id}(id=${book.id})}" method="post">
+                <div class="mb-3">
+                    <label for="title" class="form-label" th:text="#{form.book.title}">Book Title</label>
+                    <input type="text" class="form-control" id="title" name="title" th:value="${book.title}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="author" class="form-label" th:text="#{form.book.author}">Author</label>
+                    <input type="text" class="form-control" id="author" name="author" th:value="${book.author}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label" th:text="#{form.book.description}">Description</label>
+                    <textarea class="form-control" id="description" name="description" rows="4" th:text="${book.description}" required></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="price" class="form-label" th:text="#{form.book.price}">Price (USD)</label>
+                    <input type="number" class="form-control" id="price" name="price" th:value="${book.price}" step="0.01" required>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <a th:href="@{/home}" class="btn btn-secondary" th:text="#{button.cancel}">Cancel</a>
+                    <button type="submit" class="btn btn-primary" th:text="#{button.save.changes}">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

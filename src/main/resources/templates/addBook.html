@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{page.add.book.title}">Add a New Book</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+          crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css">
+
+    <style>
+        /* Page background */
+        body {
+            background-color: #f8bbd0; /* Baby pink background */
+            font-family: Arial, sans-serif; /* Consistent font */
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Navigation bar styles */
+        .navbar {
+            background-color: white !important; /* White navbar background */
+            border-bottom: 1px solid #ddd; /* Optional: subtle border at the bottom */
+        }
+
+        .navbar-brand, .nav-link {
+            color: black !important; /* Black text for nav links */
+        }
+
+        .navbar-brand:hover, .nav-link:hover {
+            color: #555 !important; /* Darker shade on hover */
+        }
+
+        /* Button styles */
+        .btn-primary {
+            background-color: black !important; /* Black button background */
+            border-color: black !important; /* Black border */
+            color: white !important; /* White text */
+        }
+
+        .btn-primary:hover {
+            background-color: white !important; /* White background on hover */
+            color: black !important; /* Black text on hover */
+        }
+
+        .btn-secondary {
+            background-color: #555 !important; /* Dark gray background for secondary buttons */
+            border-color: #555 !important; /* Dark gray border */
+            color: white !important; /* White text */
+        }
+
+        .btn-secondary:hover {
+            background-color: white !important; /* White background on hover */
+            color: #555 !important; /* Dark gray text on hover */
+        }
+    </style>
+
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" th:href="@{/home}" th:text="#{nav.title}">Your Book Repository</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" sec:authorize="isAuthenticated()" th:href="@{/logout}" th:text="#{nav.logout}">Logout</a>
+                </li>
+            </ul>
+            <div class="navbar-nav">
+                <a th:href="@{/home(lang='en')}" class="me-3" th:text="#{nav.language.en}">English</a>
+                <a th:href="@{/home(lang='hr')}" class="me-3" th:text="#{nav.language.hr}">Croatian</a>
+            </div>
+        </div>
+    </div>
+</nav>
+<br/>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Success Message -->
+            <div th:if="${param.success}" class="alert alert-success" th:text="#{success.book.added}">
+                Book successfully added!
+            </div>
+
+            <h1 class="text-center" th:text="#{page.add.book.title}">Add a New Book</h1>
+
+            <!-- General Error Messages -->
+            <div th:if="${error == 'REQUIRED_FIELDS'}" class="alert alert-danger" th:text="#{error.required.fields}">
+                All fields are required.
+            </div>
+
+            <div th:if="${error == 'DESCRIPTION_TOO_LONG'}" class="alert alert-danger" th:text="#{error.description.length}">
+                Description exceeds the maximum allowed length of 255 characters. Please shorten it.
+            </div>
+
+            <div class="mt-4">
+                <form id="book-form" th:action="@{/private/api/poll/create}" method="post">
+                    <input type="hidden" name="userEmail" th:value="${userEmail}">
+                    <div class="mb-3">
+                        <label for="title" class="form-label" th:text="#{form.book.title}">Book Title</label>
+                        <input type="text" class="form-control" id="title" name="title"
+                               th:value="${title}"
+                               th:placeholder="#{form.book.title.placeholder}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="author" class="form-label" th:text="#{form.book.author}">Author</label>
+                        <input type="text" class="form-control" id="author" name="author"
+                               th:value="${author}"
+                               th:placeholder="#{form.book.author.placeholder}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label" th:text="#{form.book.description}">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="4"
+                                  th:value="${description}"
+                                  th:placeholder="#{form.book.description.placeholder}" required></textarea>
+                        <small class="text-muted" th:text="#{form.book.description.hint}">Maximum 255 characters.</small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="price" class="form-label" th:text="#{form.book.price}">Price</label>
+                        <input type="number" step="0.01" class="form-control" id="price" name="price"
+                               th:value="${price}"
+                               th:placeholder="#{form.book.price.placeholder}" required>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <a th:href="@{/home}" class="btn btn-secondary" th:text="#{button.cancel}">Cancel</a>
+                        <button type="submit" class="btn btn-primary" th:text="#{button.add.book}">Add Book</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    // Use the resolved error message dynamically
+    var errorMessage = /*[[#{error.description.length}]]*/ 'Description exceeds the maximum allowed length of 255 characters. Please shorten it.';
+
+    // Client-side validation for description length
+    document.getElementById('book-form').addEventListener('submit', function (e) {
+        const description = document.getElementById('description').value;
+        if (description.length > 255) {
+            e.preventDefault(); // Prevent form submission
+            alert(errorMessage);
+        }
+    });
+</script>
+</body>
+</html>
