@@ -9,7 +9,7 @@
 - **Database Communication**: ORM mapping with Hibernate & JPA 
 - **REST API**: Endpoints for managing users & books 
 - **Unit Testing**: JUnit & Mockito for service, repository, and controllers 
-- **(Optional) Multilingual & Task Scheduling**: For complex features 
+- **Multilingual & Task Scheduling**: For complex features 
 
 ## 🛠 Tech Stack  
 - **Spring Boot, Security, Data JPA, JDBC**  
